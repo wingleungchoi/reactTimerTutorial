@@ -15,7 +15,14 @@
 
 var CourseChooser = React.createClass({
     getInitialState: function(){
-        return { total: 0 };
+        return {
+            total:        0,
+            searchString: ''
+        };
+    },
+
+    handleChange: function(e){
+        this.setState({ searchString: e.target.value });
     },
 
     addTotal: function( price ) {
@@ -24,12 +31,26 @@ var CourseChooser = React.createClass({
 
     render: function() {
         var self = this;
-        var courses = this.props.items.map(function(c){
+        var searchString = this.state.searchString.trim().toLowerCase();
+
+        if(searchString.length > 0){
+
+            var courses = this.props.items.filter(function(c){
+                return c.name.toLowerCase().match( searchString );
+            });
+
+        } else {
+            var courses = this.props.items;
+        }
+        courses = courses.map(function(c){
             return <Course name={c.name} url={c.url} price={c.price} active={c.active} addTotal={self.addTotal} />;
         });
 
+
         return <div>
             <h1>Our courses</h1>
+            <input type="text" value={searchString} onChange={this.handleChange} placeholder="Type here" />
+
             <div id="courses">
                 {courses}
                 <p id="total">Total <b>${this.state.total.toFixed(2)}</b></p>
